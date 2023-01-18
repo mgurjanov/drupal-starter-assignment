@@ -1,0 +1,8 @@
+<div class="w-full h-14 border-t flex border-gray-200">
+  {% for item in items %}
+    <div
+      class="flex items-center justify-center items-center h-full w-1/{{ items|length }} pl-6 py-6 first:border-l-0 border-l border-gray-200 mt-0">
+      {{ item }}
+    </div>
+  {% endfor %}
+</div>

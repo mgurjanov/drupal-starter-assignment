@@ -232,6 +232,54 @@ function server_theme_theme() {
     ],
   ];
 
+  // Person card.
+  $info['server_theme_card__person'] = [
+    'variables' => [
+      // A render array.
+      'items' => NULL,
+    ],
+  ];
+
+
+  // Multiple person cards as grid.
+  $info['server_theme_card__person_grid'] = [
+    'variables' => [
+      // A list of person cards.
+      'items' => [],
+    ],
+  ];
+
+  // Person card leading content section.
+  $info['server_theme_card__person_leading_content'] = [
+    'variables' => [
+      'items' => [],
+    ],
+  ];
+
+  // Badge wrap element.
+  $info['server_theme_badge'] = [
+    'variables' => [
+      'color' => NULL,
+      'item' => [],
+    ],
+  ];
+
+  // Action link with icon before.
+  $info['server_theme_link_with_icon'] = [
+    'variables' => [
+      'title' => NULL,
+      'url_value' => NULL,
+      'action' => NULL,
+    ],
+  ];
+
+  // Grid of action links with icons.
+  $info['server_theme_link_with_icon_grid'] = [
+    'variables' => [
+      'items' => NULL,
+    ],
+  ];
+
   // "Call to action" element.
   $info['server_theme_element__cta'] = [
     'variables' => [

@@ -8,6 +8,7 @@ use Drupal\Core\Utility\LinkGenerator;
 use Drupal\media\IFrameUrlHelper;
 use Drupal\node\Entity\Node;
 use Drupal\pluggable_entity_view_builder\BuildFieldTrait;
+use Drupal\server_general\BadgeTrait;
 use Drupal\server_general\ButtonTrait;
 use Drupal\server_general\CardTrait;
 use Drupal\server_general\ElementTrait;
@@ -37,6 +38,7 @@ class StyleGuideController extends ControllerBase {
   use StyleGuideElementWrapTrait;
   use TagTrait;
   use TitleAndLabelsTrait;
+  use BadgeTrait;
 
   /**
    * The link generator service.
@@ -98,6 +100,12 @@ class StyleGuideController extends ControllerBase {
   protected function getAllElements() : array {
     $build = [];
 
+    $element = $this->getPersonCardGrid(1);
+    $build[] = $this->wrapElementWideContainer($element, 'Person card');
+
+    $element = $this->getPersonCardGrid(10);
+    $build[] = $this->wrapElementWideContainer($element, 'Person card\'s');
+
     $element = $this->getPageTitle();
     $build[] = $this->wrapElementWideContainer($element, 'Page title');
 
@@ -144,6 +152,216 @@ class StyleGuideController extends ControllerBase {
     $build[] = $this->wrapElementWideContainer($element, 'Media: Video');
 
     return $build;
+  }
+
+  /**
+   * Method that returns themed person card.
+   *
+   * @return array
+   *  Render array of person card.
+   */
+  protected function getPersonCard(): array {
+
+    return $this->buildPersonCard($this->getRandomPerson());
+  }
+
+  /**
+   * Get a random person's data for demo purpose.
+   *
+   * @return array
+   *   A random person's data array.
+   */
+  protected function getRandomPerson(): array {
+
+    $firstnames = [
+      'Gifford',
+      'Grant',
+      'Grayson',
+      'Gregory',
+      'Gresham',
+      'Griswald',
+      'Grover',
+      'Guy',
+      'Hadden',
+      'Hadley',
+      'Hadwin',
+      'Hal',
+    ];
+
+    $lastnames = [
+      'Fisher',
+      'Fletcher',
+      'Grady',
+      'Hunter',
+      'Jacoby',
+      'Jagger',
+      'Jaxon',
+      'Jett',
+      'Kade',
+    ];
+
+    $job_titles = [
+      'Doctor (GP)',
+      'Doctor (Hospital)',
+      'DramaTherapist',
+      'Economist',
+      'Editorial Assistant',
+      'Education Administrator',
+      'Electrical Engineer',
+    ];
+
+    $roles = [
+      'admin',
+      'content admin',
+      'content editor',
+      'recruiter',
+    ];
+
+    // Url used for link inside person image.
+    $url = Url::fromRoute('<front>');
+
+    $elements = [];
+
+    // Person image.
+    $image = [
+      '#theme' => 'image',
+      '#uri' => $this->getPlaceholderPersonImage(128),
+      '#width' => 128,
+    ];
+
+    // Image should be clickable.
+    $image = [
+      '#type' => 'html_tag',
+      '#tag' => 'a',
+      '#value' =>  \Drupal::service('renderer')->render($image),
+      '#attributes' => ['href' => $url->toString()],
+    ];
+
+    // Add person image to leading content information section.
+    $leading_content_elements[] = $this->wrapRoundedCornersFull($image);
+
+    // Generate person name and surname (also used for email).
+    $first_name = $firstnames[array_rand($firstnames)];
+    $last_name = $lastnames[array_rand($lastnames)];
+
+    $inner_elements[] = ['#markup' => $first_name . ' ' . $last_name];
+
+    // Generate job title.
+    $inner_elements[] = $this->wrapTextColor(['#markup' => $job_titles[array_rand($job_titles)]], 'light-gray');
+
+    // Generate person role and warp it inside badge.
+    $role = $roles[array_rand($roles)];
+    $inner_elements[] = $this->wrapElementRoundedBadge($role, 'green');
+
+    // Add rest of person information to leading content information section.
+    $leading_content_elements[] = $this->wrapContainerVerticalSpacingTiny($inner_elements, 'center');
+
+    // Add leading content information data to main elements array.
+    $elements[] = $this->wrapElementPersonCardLeadingContent($leading_content_elements);
+
+    // Build action links like email, call. Twig is created so that it can potentially accept more then 2 elements.
+    $icon_elements[] = $this->buildLinkWithIcon('Email', strtolower($first_name . '.' . $last_name . '@company.com'), 'email');
+    $icon_elements[] = $this->buildLinkWithIcon('Call', mt_rand(11111111,99999999), 'call');
+
+    // Add actions as gid to the main elements array.
+    $elements[] = $this->buildLinkWithIconGrid($icon_elements);
+
+    return $elements;
+  }
+
+  /**
+   * Builds link with icon in front of text.
+   *
+   * @param string $title
+   *  Link title.
+   * @param string $url_value
+   *  Value used in url like email address or phone number.
+   * @param string $action
+   *  Actual action like call, email which determines link value and icon.
+   *
+   * @return array
+   *  Render array of link with icon.
+   */
+  protected function buildLinkWithIcon(string $title, string $url_value, string $action): array {
+    return [
+      '#theme' => 'server_theme_link_with_icon',
+      '#title' => $title,
+      '#url_value' => $url_value,
+      '#action' => $action,
+    ];
+  }
+
+  /**
+   * Creates a grid of links with icons.
+   *
+   * @param array $items
+   *  Icon with link render arrays.
+   *
+   * @return array
+   *  Render array of links with icons in a grid.
+   */
+  protected function buildLinkWithIconGrid(array $items): array {
+    return [
+      '#theme' => 'server_theme_link_with_icon_grid',
+      '#items' => $items,
+    ];
+  }
+
+  /**
+   * Builds person card from given items.
+   *
+   * @param array $items
+   *  Array of render array(s).
+   *
+   * @return array
+   *  Render array of person card.
+   */
+  protected function buildPersonCard(array $items): array {
+
+    return [
+      '#theme' => 'server_theme_card__person',
+      '#items' => $items,
+    ];
+  }
+
+  /**
+   * Wraps person card leading content info to be separate from action links.
+   *
+   * @param array $items
+   *   Array of render array(s).
+   *
+   * @return array
+   *  Render array of items themed for leading content section.
+   */
+  protected function wrapElementPersonCardLeadingContent(array $items): array {
+
+    return [
+      '#theme' => 'server_theme_card__person_leading_content',
+      '#items' => $items,
+    ];
+  }
+
+  /**
+   * Generates a grid of person cards based on number.
+   *
+   * @param int $size
+   *  Number of person cards to generate for demo.
+   *
+   * @return array
+   *  Render array of items in a grid.
+   */
+  protected function getPersonCardGrid(int $size): array {
+
+    $items = [];
+
+    for ($i = 0; $i < $size; $i++) {
+      $items[] = $this->getPersonCard();
+    }
+
+    return [
+      '#theme' => 'server_theme_card__person_grid',
+      '#items' => $items,
+    ];
   }
 
   /**
