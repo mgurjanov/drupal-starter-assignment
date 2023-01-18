@@ -3,7 +3,6 @@
 namespace Drupal\server_style_guide\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\LinkGenerator;
 use Drupal\media\IFrameUrlHelper;
