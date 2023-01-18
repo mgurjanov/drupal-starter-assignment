@@ -447,8 +447,7 @@ class StyleGuideController extends ControllerBase {
     $items = [];
     $url = Url::fromRoute('<front>');
 
-    //    $names = ['Jon Doe', 'Smith Allen', 'David Bowie'];
-    $names = ['Jon Doe'];
+    $names = ['Jon Doe', 'Smith Allen', 'David Bowie'];
     foreach ($names as $key => $name) {
       $elements = [];
       $element = [
